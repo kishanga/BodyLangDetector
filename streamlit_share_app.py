@@ -123,7 +123,7 @@ class VideoProcessor:
                 # Dashboard
                 # kpil_text.write(f"<h1 style='text-align: center; color:red;'>{body_language_class}</h1>", unsafe_allow_html=True)
                 
-                return av.VideoFrame.from_ndarray(img, format="bgr24")
+                # return av.VideoFrame.from_ndarray(img, format="bgr24")
 
             except:
                 pass
