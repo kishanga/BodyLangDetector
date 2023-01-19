@@ -33,57 +33,66 @@ RTC_CONFIGURATION = RTCConfiguration(
 
 class VideoProcessor:
     def recv(self, frame):
-        img = frame.to_ndarray(format="bgr24")
         
-        # vision processing
-        # flipped = img[:, ::-1, :]
-
-        # model processing
-        # im_pil = Image.fromarray(flipped)
-        img = cv2.flip(img,1)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-
-        img.flags.writeable = False  
-        # results = st.model(im_pil, size=112)
-        
-        mp_holistic = mp.solutions.holistic
-        holistic = mp_holistic.Holistic(min_detection_confidence=0.7, min_tracking_confidence=0.7)
-        results = holistic.process(img)
+        try:
         
         
-         # Recolor image back to BGR for rendering
-        img.flags.writeable = True   
-        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+            img = frame.to_ndarray(format="bgr24")
+
+            # vision processing
+            # flipped = img[:, ::-1, :]
+
+            # model processing
+            # im_pil = Image.fromarray(flipped)
+            img = cv2.flip(img,1)
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+            img.flags.writeable = False  
+            # results = st.model(im_pil, size=112)
+
+            mp_holistic = mp.solutions.holistic
+            holistic = mp_holistic.Holistic(min_detection_confidence=0.7, min_tracking_confidence=0.7)
+            results = holistic.process(img)
+
+
+             # Recolor image back to BGR for rendering
+            img.flags.writeable = True   
+            img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+
+
+            # Extract Pose landmarks
+            pose = results.pose_landmarks.landmark
+            pose_row = list(np.array([[landmark.x, landmark.y, landmark.z, landmark.visibility] for landmark in pose]).flatten())
+
+            # Extract Right Hand landmarks
+            rhand = results.right_hand_landmarks.landmark
+            rhand_row = list(np.array([[landmark.x, landmark.y, landmark.z, landmark.visibility] for landmark in rhand]).flatten())
+
+            # Extract Left Hand landmarks
+            lhand = results.left_hand_landmarks.landmark
+            lhand_row = list(np.array([[landmark.x, landmark.y, landmark.z, landmark.visibility] for landmark in lhand]).flatten())
+
+
+            # Concate rows
+            row = pose_row + rhand_row + lhand_row
+
+            # Make Detections
+            X = pd.DataFrame([row])
+            body_language_class = model.predict(X)[0]
+            # body_language_prob = model.predict_proba(X)[0]
+            # print(body_language_class, body_language_prob)
+
+
+            bbox_img = np.array(body_language_class)
+            # bbox_img = np.array(results.render()[0])
+
+            return av.VideoFrame.from_ndarray(bbox_img, format="bgr24")
+
+        except:
+            pass
         
-
-        # Extract Pose landmarks
-        pose = results.pose_landmarks.landmark
-        pose_row = list(np.array([[landmark.x, landmark.y, landmark.z, landmark.visibility] for landmark in pose]).flatten())
-
-        # Extract Right Hand landmarks
-        rhand = results.right_hand_landmarks.landmark
-        rhand_row = list(np.array([[landmark.x, landmark.y, landmark.z, landmark.visibility] for landmark in rhand]).flatten())
-
-        # Extract Left Hand landmarks
-        lhand = results.left_hand_landmarks.landmark
-        lhand_row = list(np.array([[landmark.x, landmark.y, landmark.z, landmark.visibility] for landmark in lhand]).flatten())
-
-
-        # Concate rows
-        row = pose_row + rhand_row + lhand_row
-
-        # Make Detections
-        X = pd.DataFrame([row])
-        body_language_class = model.predict(X)[0]
-        # body_language_prob = model.predict_proba(X)[0]
-        # print(body_language_class, body_language_prob)
-
         
-        bbox_img = np.array(body_language_class)
-        # bbox_img = np.array(results.render()[0])
-
-        return av.VideoFrame.from_ndarray(bbox_img, format="bgr24")
-
+        
 
 webrtc_ctx = webrtc_streamer(
     key="WYH",
