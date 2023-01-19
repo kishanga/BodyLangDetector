@@ -40,7 +40,15 @@ class VideoProcessor:
 
         # model processing
         im_pil = Image.fromarray(flipped)
-        results = st.model(im_pil, size=112)
+        # results = st.model(im_pil, size=112)
+        
+        results = holistic.process(im_pil)
+        
+        # body_language_class = model.predict(X)[0]
+        #body_language_prob = model.predict_proba(X)[0]
+        # print(body_language_class, body_language_prob)
+        
+        
         bbox_img = np.array(results.render()[0])
 
         return av.VideoFrame.from_ndarray(bbox_img, format="bgr24")
