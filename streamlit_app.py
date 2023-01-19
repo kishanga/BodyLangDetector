@@ -55,12 +55,32 @@ class VideoProcessor:
         img.flags.writeable = True   
         img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
         
-        # body_language_class = model.predict(X)[0]
+
+        # Extract Pose landmarks
+        pose = results.pose_landmarks.landmark
+        pose_row = list(np.array([[landmark.x, landmark.y, landmark.z, landmark.visibility] for landmark in pose]).flatten())
+
+        # Extract Right Hand landmarks
+        rhand = results.right_hand_landmarks.landmark
+        rhand_row = list(np.array([[landmark.x, landmark.y, landmark.z, landmark.visibility] for landmark in rhand]).flatten())
+
+        # Extract Left Hand landmarks
+        lhand = results.left_hand_landmarks.landmark
+        lhand_row = list(np.array([[landmark.x, landmark.y, landmark.z, landmark.visibility] for landmark in lhand]).flatten())
+
+
+        # Concate rows
+        row = pose_row + rhand_row + lhand_row
+
+        # Make Detections
+        X = pd.DataFrame([row])
+        body_language_class = model.predict(X)[0]
         # body_language_prob = model.predict_proba(X)[0]
         # print(body_language_class, body_language_prob)
+
         
-        
-        bbox_img = np.array(results.render()[0])
+        bbox_img = np.array(body_language_class)
+        # bbox_img = np.array(results.render()[0])
 
         return av.VideoFrame.from_ndarray(bbox_img, format="bgr24")
 
