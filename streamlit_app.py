@@ -42,6 +42,8 @@ class VideoProcessor:
         im_pil = Image.fromarray(flipped)
         # results = st.model(im_pil, size=112)
         
+        mp_holistic = mp.solutions.holistic
+        holistic = mp_holistic.Holistic(min_detection_confidence=0.7, min_tracking_confidence=0.7)
         results = holistic.process(im_pil)
         
         # body_language_class = model.predict(X)[0]
