@@ -36,18 +36,27 @@ class VideoProcessor:
         img = frame.to_ndarray(format="bgr24")
         
         # vision processing
-        flipped = img[:, ::-1, :]
+        # flipped = img[:, ::-1, :]
 
         # model processing
-        im_pil = Image.fromarray(flipped)
+        # im_pil = Image.fromarray(flipped)
+        img = cv2.flip(img,1)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+        img.flags.writeable = False  
         # results = st.model(im_pil, size=112)
         
         mp_holistic = mp.solutions.holistic
         holistic = mp_holistic.Holistic(min_detection_confidence=0.7, min_tracking_confidence=0.7)
-        results = holistic.process(im_pil)
+        results = holistic.process(img)
+        
+        
+         # Recolor image back to BGR for rendering
+        img.flags.writeable = True   
+        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
         
         # body_language_class = model.predict(X)[0]
-        #body_language_prob = model.predict_proba(X)[0]
+        # body_language_prob = model.predict_proba(X)[0]
         # print(body_language_class, body_language_prob)
         
         
