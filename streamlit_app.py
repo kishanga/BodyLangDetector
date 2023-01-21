@@ -88,7 +88,7 @@ class VideoProcessor:
 
             return av.VideoFrame.from_ndarray(bbox_img, format="bgr24")
 
-        except as e:
+        except Exception as e:
             print(e)
             pass
         
