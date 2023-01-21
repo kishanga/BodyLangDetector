@@ -32,7 +32,7 @@ RTC_CONFIGURATION = RTCConfiguration(
 
 
 class VideoProcessor:
-    def recv(self, frame):
+    def recv_queued(self, frame):
         
         try:
         
