@@ -35,7 +35,7 @@ class VideoProcessor:
     def recv(self, frame):
         
         try:
-        
+            print("It works - 1")
         
             img = frame.to_ndarray(format="bgr24")
 
@@ -46,14 +46,14 @@ class VideoProcessor:
             # im_pil = Image.fromarray(flipped)
             img = cv2.flip(img,1)
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-
+            print("It works - 2")
             img.flags.writeable = False  
             # results = st.model(im_pil, size=112)
 
             mp_holistic = mp.solutions.holistic
             holistic = mp_holistic.Holistic(min_detection_confidence=0.7, min_tracking_confidence=0.7)
             results = holistic.process(img)
-
+            print("It works - 3")
 
              # Recolor image back to BGR for rendering
             img.flags.writeable = True   
