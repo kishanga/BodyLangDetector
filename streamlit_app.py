@@ -32,7 +32,7 @@ RTC_CONFIGURATION = RTCConfiguration(
 
 
 class VideoProcessor:
-    def recv_queued(self, frame):
+    def recv(self, frame):
         
         try:
         
@@ -88,8 +88,7 @@ class VideoProcessor:
 
             return av.VideoFrame.from_ndarray(bbox_img, format="bgr24")
 
-        except Exception as e:
-            print(e)
+        except:
             pass
         
         
@@ -101,5 +100,5 @@ webrtc_ctx = webrtc_streamer(
     rtc_configuration=RTC_CONFIGURATION,
     video_processor_factory=VideoProcessor,
     media_stream_constraints={"video": True, "audio": False},
-    async_processing=True,
+    async_processing=False,
 )
